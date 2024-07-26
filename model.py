@@ -104,7 +104,8 @@ class LGCN(MessagePassing):
             if self.verbose:
                 print("The relative user drift temporal embedding is ON.")
                 
-        self.f = nn.ReLU()
+        #self.f = nn.ReLU()
+        self.f = nn.Sigmoid()
         #self.f = nn.GELU()
               
     def forward(self, edge_index: Tensor, src: Tensor, dest: Tensor, u_abs_t_decay: Tensor, u_rel_t_decay: Tensor):
