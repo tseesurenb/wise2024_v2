@@ -270,7 +270,7 @@ def run_experiment(rating_df, num_users, num_items, g_mean_rating, g_seed):
 
 
 # load the dataset
-rating_df, user_df, item_df, rating_stat = dp.load_data2(dataset=g_dataset, verbose=False)
+rating_df, user_df, item_df, rating_stat = dp.load_data2(dataset=g_dataset, verbose=True)
 num_users, num_items, g_mean_rating = rating_stat['num_users'], rating_stat['num_items'], rating_stat['mean_rating']
 
 # add time distance column by calculating timestamp from the fixed minimum point
