@@ -393,8 +393,9 @@ def load_data2(dataset = "ml100k", verbose = False):
         num_users = len(ratings_df['userId'].unique())
         num_items = len(ratings_df['itemId'].unique())
         mean_rating = ratings_df['rating'].mean()
+        num_ratings = len(ratings_df)
         
-        rating_stat = {'num_users': num_users, 'num_items': num_items, 'mean_rating': mean_rating}
+        rating_stat = {'num_users': num_users, 'num_items': num_items, 'mean_rating': mean_rating, 'num_ratings': num_ratings}
     
     if verbose:
         print(rating_stat)
