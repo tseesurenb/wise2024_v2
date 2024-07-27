@@ -174,8 +174,9 @@ class LGCN(MessagePassing):
         
         if self.model != 'lgcn': 
             _inner_pro = _inner_pro + self.mu
-        
-        ratings = self.f(_inner_pro)
+            ratings = self.f(_inner_pro)
+        else:
+            ratings = _inner_pro
               
         return ratings
     
