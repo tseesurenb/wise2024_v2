@@ -177,6 +177,8 @@ class LGCN(MessagePassing):
             ratings = self.f(_inner_pro)
         else:
             ratings = _inner_pro
+        
+        #ratings = self.f(_inner_pro)
               
         return ratings
     
