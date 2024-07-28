@@ -50,6 +50,8 @@ def run_experiment(rating_df, num_users, num_items, g_mean_rating, g_seed):
 
     split_ratio = 0.2
 
+    dp.rmat_2_adjmat_simple(num_users, num_items, rmat_data)
+    
     rmat_train_data, rmat_val_data = dp.train_test_split_by_user2(rmat_data, test_size=split_ratio, seed=g_seed, verbose=False)
 
     #edge_train_data = dp.rmat_2_adjmat(num_users, num_items, rmat_train_data)
@@ -264,14 +266,14 @@ def run_experiment(rating_df, num_users, num_items, g_mean_rating, g_seed):
 
     tqdm.write(f"\033[1mMinimum Seed {seed} -> RMSE: {min_RMSE_loss} at epoch {min_RMSE_epoch} with Recall, Precision, F1, NCDG: {min_RECALL_f, min_PRECISION_f, min_F1, min_ncdg}\033[0m")
 
-    plot_loss(val_epochs, train_losses, val_losses, train_rmse, val_rmse, val_recall, val_prec)
+    #plot_loss(val_epochs, train_losses, val_losses, train_rmse, val_rmse, val_recall, val_prec)
     
     return min_RMSE, min_RECALL, min_PRECISION, min_ncdg
 
 
 # load the dataset
 rating_df, user_df, item_df, rating_stat = dp.load_data2(dataset=g_dataset, verbose=True)
-num_users, num_items, g_mean_rating, num_ratings = rating_stat['num_users'], rating_stat['num_items'], rating_stat['mean_rating'], rating_stat['num_ratings']
+num_users, num_items, g_mean_rating, num_ratings, time_distance = rating_stat['num_users'], rating_stat['num_items'], rating_stat['mean_rating'], rating_stat['num_ratings'], rating_stat['time_distance']
 
 # add time distance column by calculating timestamp from the fixed minimum point
 if g_model == 'lgcn_b_a' or g_model == 'lgcn_b_ar' or g_model=='lgcn_ar':
@@ -280,8 +282,8 @@ if g_model == 'lgcn_b_a' or g_model == 'lgcn_b_ar' or g_model=='lgcn_ar':
 if g_model == 'lgcn_b_r' or g_model == 'lgcn_b_ar' or g_model=='lgcn_ar':
     rating_df = dp.add_u_rel_decay(rating_df=rating_df, beta=g_r_beta, win_size = g_win, method=r_method, verbose=g_verbose)
 
-#rand_seed = [7, 12, 89, 91, 41]
-rand_seed = [7]
+rand_seed = [7, 12, 89, 91, 41]
+#rand_seed = [7]
 #rand_seed = [7, 2]
 
 rmses = []

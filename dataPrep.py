@@ -395,7 +395,12 @@ def load_data2(dataset = "ml100k", verbose = False):
         mean_rating = ratings_df['rating'].mean()
         num_ratings = len(ratings_df)
         
-        rating_stat = {'num_users': num_users, 'num_items': num_items, 'mean_rating': mean_rating, 'num_ratings': num_ratings}
+        # Calculate the max-min time distance
+        min_timestamp = ratings_df['timestamp'].min()
+        max_timestamp = ratings_df['timestamp'].max()
+        max_min_time_distance = (max_timestamp - min_timestamp) / 86400
+        
+        rating_stat = {'num_users': num_users, 'num_items': num_items, 'mean_rating': mean_rating, 'num_ratings': num_ratings, 'time_distance': max_min_time_distance}
     
     if verbose:
         print(rating_stat)
