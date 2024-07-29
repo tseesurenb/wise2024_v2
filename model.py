@@ -137,7 +137,7 @@ class LGCN(MessagePassing):
         for i in range(self.num_layers):
             emb_k = self.propagate(edge_index=self.edge_index_norm[0], x=emb_k, norm=self.edge_index_norm[1])
             #emb_k = self.propagate(edge_index=edge_index, x=emb_k, norm=self.edge_index_norm)
-            emb_k = F.dropout(emb_k, p=self.dropout, training=self.training)  # Apply dropout
+            #emb_k = F.dropout(emb_k, p=self.dropout, training=self.training)  # Apply dropout
             embs.append(emb_k)
              
         embs = torch.stack(embs, dim=1)
