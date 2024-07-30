@@ -49,6 +49,15 @@ python main.py
 
 13. --top_k sets the number of top k value. The default value: 20
 
+# Run for the best results:
+
+# for ml-100k
+
+# for ml-1m
+python main.py --batch_size=950000  --model=lgcn_b_ar --dataset=ml-1m --epochs=851 --layer=5  --decay=1e-06  --a_beta=0.06 --r_method='exp' --epochs_per_eval=25 --r_beta=5 --emb_dim=500
+
+# for douban-book
+main.py  --batch_size=400000 --epochs=201  --epochs_per_eval=5  --layer=0  --decay=1e-03  --model=lgcn  --a_beta=0.001 --a_method=exp --r_beta=0.008 --dataset=douban_book --top_k=5
 
 ## Extend:
 * If you want to run tempLGCN on your own dataset, you can just feed any data that has "user item rating timestamp" format and use --dataset parameter to provide the name of your dataset. Datasets are stored in the data subfolder.

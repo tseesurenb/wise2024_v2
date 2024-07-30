@@ -36,6 +36,8 @@ class LGCN(MessagePassing):
         self.model = model
         self.dropout = drop
         
+        print("The model is: ", model, " with ", num_layers, " layers" and " embedding dimension: ", embedding_dim, " and dropout: ", drop, ".")
+        
         self.user_baseline = False
         self.item_baseline = False
         self.u_abs_drift = False
@@ -106,8 +108,6 @@ class LGCN(MessagePassing):
                 print("The relative user drift temporal embedding is ON.")
                 
         self.f = nn.ReLU()
-        #self.f = nn.Sigmoid()
-        #self.f = nn.GELU()
               
     def forward(self, edge_index: Tensor, src: Tensor, dest: Tensor, u_abs_t_decay: Tensor, u_rel_t_decay: Tensor):
         
