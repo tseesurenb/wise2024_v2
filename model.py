@@ -32,7 +32,7 @@ class LGCN(MessagePassing):
         self.add_self_loops = add_self_loops
         self.edge_index_norm = None
         self.verbose = verbose
-        self.mu = mu
+        self.mu = 0 #mu
         self.model = model
         self.dropout = drop
         
@@ -66,6 +66,7 @@ class LGCN(MessagePassing):
         else: # pure lightGCN model only
             model = 'lgcn'
             self.mu = 0
+        
         
         self.users_emb = nn.Embedding(num_embeddings=self.num_users, embedding_dim=self.embedding_dim)
         self.items_emb = nn.Embedding(num_embeddings=self.num_items, embedding_dim=self.embedding_dim)
@@ -155,11 +156,11 @@ class LGCN(MessagePassing):
         if self.user_baseline:
             _u_base_emb = self._u_base_emb.weight[src]
             _inner_pro = _inner_pro + _u_base_emb
-        
+            
         if self.item_baseline:
             _i_base_emb = self._i_base_emb.weight[dest]
             _inner_pro = _inner_pro + _i_base_emb
-        
+            
         if self.u_abs_drift:
             _u_abs_drift_emb = self._u_abs_drift_emb.weight[src]
             _u_abs_drift_emb = _u_abs_drift_emb * u_abs_t_decay.unsqueeze(1)
@@ -173,7 +174,7 @@ class LGCN(MessagePassing):
         _inner_pro = torch.sum(_inner_pro, dim=-1)
         
         if self.model != 'lgcn': 
-            _inner_pro = _inner_pro + self.mu
+            #_inner_pro = _inner_pro + self.mu
             ratings = self.f(_inner_pro)
         else:
             ratings = _inner_pro

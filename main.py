@@ -86,7 +86,10 @@ def run_experiment(rating_df, num_users, num_items, g_mean_rating, g_seed):
     # evaluation variables
     val_recall = []
     val_prec = []
-    val_ncdg = []
+    val_ncdg_5 = []
+    val_ncdg_10 = []
+    val_ncdg_15 = []
+    val_ncdg_20 = []
     val_rmse = []
     train_rmse = []
 
@@ -217,13 +220,19 @@ def run_experiment(rating_df, num_users, num_items, g_mean_rating, g_seed):
                                                             torch.tensor(val_pred_ratings),
                                                             k=g_top_k)
                 
-                ncdg = calculate_ndcg(r_mat_val_idx, r_mat_val_v, val_pred_ratings, k=g_top_k)
+                ncdg_5 = calculate_ndcg(r_mat_val_idx, r_mat_val_v, val_pred_ratings, k=5)
+                ncdg_10 = calculate_ndcg(r_mat_val_idx, r_mat_val_v, val_pred_ratings, k=10)
+                ncdg_15 = calculate_ndcg(r_mat_val_idx, r_mat_val_v, val_pred_ratings, k=15)
+                ncdg_20 = calculate_ndcg(r_mat_val_idx, r_mat_val_v, val_pred_ratings, k=20)
                 
                 recall = round(recall, 3)
                 prec = round(prec, 3)
                 val_recall.append(recall)
                 val_prec.append(prec)
-                val_ncdg.append(ncdg)
+                val_ncdg_5.append(ncdg_5)
+                val_ncdg_10.append(ncdg_10)
+                val_ncdg_15.append(ncdg_15)
+                val_ncdg_20.append(ncdg_20)
                 val_rmse.append(np.sqrt(val_loss.item()))
                 
                 train_losses.append(train_loss.item())
@@ -233,7 +242,10 @@ def run_experiment(rating_df, num_users, num_items, g_mean_rating, g_seed):
                 f_val_loss = "{:.4f}".format(round(np.sqrt(val_loss.item()), 4))
                 f_recall = "{:.4f}".format(round(recall, 4))
                 f_precision = "{:.4f}".format(round(prec, 4))
-                f_ncdg = "{:.4f}".format(round(ncdg, 4))
+                f_ncdg_5 = "{:.4f}".format(round(ncdg_5, 4))
+                f_ncdg_10 = "{:.4f}".format(round(ncdg_10, 4))
+                f_ncdg_15 = "{:.4f}".format(round(ncdg_15, 4))
+                f_ncdg_20 = "{:.4f}".format(round(ncdg_20, 4))
                 
                 if (recall + prec) != 0:
                     f_f1_score = "{:.4f}".format(round((2*recall*prec)/(recall + prec), 4))
@@ -253,13 +265,17 @@ def run_experiment(rating_df, num_users, num_items, g_mean_rating, g_seed):
                     min_RECALL = recall
                     min_PRECISION = prec
                     min_F1 = f_f1_score
-                    min_ncdg = ncdg
+                    min_ncdg_5 = ncdg_5
+                    min_ncdg_10 = ncdg_10
+                    min_ncdg_15 = ncdg_15
+                    min_ncdg_20 = ncdg_20
+                    min_ncdg = {"5": min_ncdg_5, "10": min_ncdg_10, "15": min_ncdg_15, "20": min_ncdg_20}
 
                 trace = True
                 if epoch %  (g_epochs_per_eval) == 0 and trace == True:
                     tqdm.write(f"[Epoch {f_epoch} - {f_time}, {avg_compute_time}]\tRMSE(train -> val): {f_train_loss}"
                             f" -> \033[1m{f_val_loss}\033[0m | "
-                            f"Recall, Prec, F_score, NCDG:{f_recall, f_precision, f_f1_score, f_ncdg}")
+                            f"Recall, Prec, F_score, NCDG(5, 10, 15, 20):{f_recall, f_precision, f_f1_score, f_ncdg_5, f_ncdg_10, f_ncdg_15, f_ncdg_20}")
                 
         all_compute_time += (time.time() - start_time)
         avg_compute_time = "{:.4f}".format(round(all_compute_time/(epoch+1), 4)) 
@@ -267,6 +283,7 @@ def run_experiment(rating_df, num_users, num_items, g_mean_rating, g_seed):
     tqdm.write(f"\033[1mMinimum Seed {seed} -> RMSE: {min_RMSE_loss} at epoch {min_RMSE_epoch} with Recall, Precision, F1, NCDG: {min_RECALL_f, min_PRECISION_f, min_F1, min_ncdg}\033[0m")
 
     #plot_loss(val_epochs, train_losses, val_losses, train_rmse, val_rmse, val_recall, val_prec)
+    
     
     return min_RMSE, min_RECALL, min_PRECISION, min_ncdg
 
@@ -292,7 +309,10 @@ rand_seed = [7, 12, 89]
 rmses = []
 recalls = []
 precs = []
-ncdgs = []
+ncdgs_5 = []
+ncdgs_10 = []
+ncdgs_15 = []
+ncdgs_20 = []
 
 exp_n = 1
 
@@ -307,7 +327,10 @@ for seed in rand_seed:
     rmses.append(rmse)
     recalls.append(recall)
     precs.append(prec)
-    ncdgs.append(ncdg)
+    ncdgs_5.append(ncdg['5'])
+    ncdgs_10.append(ncdg['10'])
+    ncdgs_15.append(ncdg['15'])
+    ncdgs_20.append(ncdg['20'])
     
     exp_n += 1
     
@@ -323,11 +346,11 @@ g_verbose = config['verbose']
 
 print(f'model: {g_model}, layers: {g_num_layers}, emb_dim: {g_emb_dim}, batch_size: {g_batch_size}, lr: {g_lr}, decay: {g_decay}, top_k: {g_top_k}, dataset: {g_dataset}')
 if g_model == 'lgcn_b_a':
-    print(f'Model: {g_model}, abs: {a_method, g_a_beta}, RMSE:{np.mean(rmses): .4f}, Recall:{np.mean(recalls): .4f}, Precision:{np.mean(precs): .4f}, NCDG:{np.mean(ncdgs): .4f}')
+    print(f'Model: {g_model}, abs: {a_method, g_a_beta}, RMSE:{np.mean(rmses): .4f}, Recall:{np.mean(recalls): .4f}, Precision:{np.mean(precs): .4f}, NCDG@5:{np.mean(ncdgs_5): .4f}, NCDG@10:{np.mean(ncdgs_10): .4f}, NCDG@15:{np.mean(ncdgs_15): .4f}, NCDG@20:{np.mean(ncdgs_20): .4f}')
 elif g_model == 'lgcn_b_r':
-    print(f'Model: {g_model}, rel: {r_method, g_r_beta}, RMSE:{np.mean(rmses): .4f}, Recall:{np.mean(recalls): .4f}, Precision:{np.mean(precs): .4f}, NCDG:{np.mean(ncdgs): .4f}')
+    print(f'Model: {g_model}, rel: {r_method, g_r_beta}, RMSE:{np.mean(rmses): .4f}, Recall:{np.mean(recalls): .4f}, Precision:{np.mean(precs): .4f}, NCDG@5:{np.mean(ncdgs_5): .4f}, NCDG@10:{np.mean(ncdgs_10): .4f}, NCDG@15:{np.mean(ncdgs_15): .4f}, NCDG@20:{np.mean(ncdgs_20): .4f}')
 elif g_model == 'lgcn_b_ar':
-    print(f'Model: {g_model}, abs: {a_method, g_a_beta}, rel: {r_method, g_r_beta}, RMSE:{np.mean(rmses): .4f}, Recall:{np.mean(recalls): .4f}, Precision:{np.mean(precs): .4f}, NCDG:{np.mean(ncdgs): .4f}')
+    print(f'Model: {g_model}, abs: {a_method, g_a_beta}, rel: {r_method, g_r_beta}, RMSE:{np.mean(rmses): .4f}, Recall:{np.mean(recalls): .4f}, Precision:{np.mean(precs): .4f}, NCDG@5:{np.mean(ncdgs_5): .4f}, NCDG@10:{np.mean(ncdgs_10): .4f}, NCDG@15:{np.mean(ncdgs_15): .4f}, NCDG@20:{np.mean(ncdgs_20): .4f}')
 else:
-    print(f'Model: {g_model}, RMSE:{np.mean(rmses): .4f}, Recall:{np.mean(recalls): .4f}, Precision:{np.mean(precs): .4f}, NCDG:{np.mean(ncdgs): .4f}')
+    print(f'Model: {g_model}, RMSE:{np.mean(rmses): .4f}, Recall:{np.mean(recalls): .4f}, Precision:{np.mean(precs): .4f}, NCDG@5:{np.mean(ncdgs_5): .4f}, NCDG@10:{np.mean(ncdgs_10): .4f}, NCDG@15:{np.mean(ncdgs_15): .4f}, NCDG@20:{np.mean(ncdgs_20): .4f}')
 #print(f'RMSE:{np.mean(rmses)}, Recall:{np.mean(recalls)}, Precision:{np.mean(precs)}, NCDG:{np.mean(ncdgs)}')
