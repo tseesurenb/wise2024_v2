@@ -52,6 +52,7 @@ python main.py
 # Run for the best results:
 
 # for ml-100k
+python main.py  --batch_size=90000 --epochs=1201  --epochs_per_eval=25  --layer=4  --decay=1e-05  --model=lgcn_b_ar --dataset=ml-100k  --a_method=log --a_beta=0.05 --r_method=exp --r_beta=0.35
 
 # for ml-1m
 python main.py --batch_size=950000  --model=lgcn_b_ar --dataset=ml-1m --epochs=851 --layer=5  --decay=1e-06  --a_beta=0.06 --r_method='exp' --epochs_per_eval=25 --r_beta=5 --emb_dim=500

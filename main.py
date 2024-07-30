@@ -299,9 +299,9 @@ if g_model == 'lgcn_b_a' or g_model == 'lgcn_b_ar' or g_model=='lgcn_ar':
 if g_model == 'lgcn_b_r' or g_model == 'lgcn_b_ar' or g_model=='lgcn_ar':
     rating_df = dp.add_u_rel_decay(rating_df=rating_df, beta=g_r_beta, win_size = g_win, method=r_method, verbose=g_verbose)
 
-#rand_seed = [7, 12, 89, 91, 41]
+rand_seed = [7, 12, 89, 91, 41]
 #rand_seed = [7, 12, 89]
-rand_seed = [7, 12, 89]
+#rand_seed = [7, 12, 89]
 
 #rand_seed = [7]
 #rand_seed = [7, 2]
