@@ -32,7 +32,7 @@ class LGCN(MessagePassing):
         self.add_self_loops = add_self_loops
         self.edge_index_norm = None
         self.verbose = verbose
-        self.mu = 0 #mu
+        self.mu = mu
         self.model = model
         self.dropout = drop
         
@@ -174,7 +174,7 @@ class LGCN(MessagePassing):
         _inner_pro = torch.sum(_inner_pro, dim=-1)
         
         if self.model != 'lgcn': 
-            #_inner_pro = _inner_pro + self.mu
+            _inner_pro = _inner_pro + self.mu
             ratings = self.f(_inner_pro)
         else:
             ratings = _inner_pro
