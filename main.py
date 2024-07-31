@@ -48,7 +48,7 @@ def run_experiment(rating_df, num_users, num_items, g_mean_rating, g_seed):
 
     rmat_data = dp.get_rmat_values(rating_df)
 
-    split_ratio = 0.2
+    split_ratio = 0.1
 
     dp.rmat_2_adjmat_simple(num_users, num_items, rmat_data)
     
