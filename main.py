@@ -40,6 +40,7 @@ g_model = config['model']
 g_win = config['win']    
 by_time = config['by_time']
 g_drop = config['drop']
+g_test_size = config['test_size']
 
 if g_verbose:
     print(f'loading {g_dataset} ...')
@@ -48,7 +49,7 @@ def run_experiment(rating_df, num_users, num_items, g_mean_rating, g_seed):
 
     rmat_data = dp.get_rmat_values(rating_df)
 
-    split_ratio = 0.15
+    split_ratio = g_test_size
 
     dp.rmat_2_adjmat_simple(num_users, num_items, rmat_data)
     

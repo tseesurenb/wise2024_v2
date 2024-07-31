@@ -33,4 +33,4 @@ config['r_method'] = args.r_method
 config['by_time'] = args.by_time
 config['loadedModel'] = args.loadedModel
 config['drop'] = args.drop
-
+config['test_size'] = args.test_size

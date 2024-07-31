@@ -29,5 +29,6 @@ def parse_args():
     parser.add_argument('--by_time', type=bool, default=False)
     parser.add_argument('--loadedModel', type=bool, default=False)
     parser.add_argument('--drop', type=float, default=0.0)
+    parser.add_argument('--test_size', type=float, default=0.1)
     
     return parser.parse_args()
