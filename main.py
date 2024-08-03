@@ -41,6 +41,7 @@ g_win = config['win']
 by_time = config['by_time']
 g_drop = config['drop']
 g_test_size = config['test_size']
+g_num_exp = config['num_exp']
 
 if g_verbose:
     print(f'loading {g_dataset} ...')
@@ -300,7 +301,18 @@ if g_model == 'lgcn_b_a' or g_model == 'lgcn_b_ar' or g_model=='lgcn_ar':
 if g_model == 'lgcn_b_r' or g_model == 'lgcn_b_ar' or g_model=='lgcn_ar':
     rating_df = dp.add_u_rel_decay(rating_df=rating_df, beta=g_r_beta, win_size = g_win, method=r_method, verbose=g_verbose)
 
-rand_seed = [7, 12, 89, 91, 41]
+if g_num_exp == 1:
+    rand_seed = [7]
+elif g_num_exp == 2:
+    rand_seed = [7, 12]
+elif g_num_exp == 3:
+    rand_seed = [7, 12, 89]
+elif g_num_exp == 4:
+    rand_seed = [7, 12, 89, 91]
+elif g_num_exp == 5:
+    rand_seed = [7, 12, 89, 91, 41]
+    
+#rand_seed = [7, 12, 89, 91, 41]
 #rand_seed = [7, 12, 89]
 #rand_seed = [7, 12, 89]
 

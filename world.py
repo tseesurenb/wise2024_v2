@@ -34,3 +34,4 @@ config['by_time'] = args.by_time
 config['loadedModel'] = args.loadedModel
 config['drop'] = args.drop
 config['test_size'] = args.test_size
+config['num_exp'] = args.num_exp
