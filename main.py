@@ -297,10 +297,10 @@ num_users, num_items, g_mean_rating, num_ratings, time_distance = rating_stat['n
 
 # add time distance column by calculating timestamp from the fixed minimum point
 if g_model == 'lgcn_b_a' or g_model == 'lgcn_b_ar' or g_model=='lgcn_ar':
-    rating_df = dp.add_u_abs_decay(rating_df=rating_df, beta=g_a_beta, method=a_method, verbose=g_verbose)
+    rating_df = dp.add_u_abs_decay(rating_df=rating_df, beta=g_a_beta, method=a_method, verbose=True)
 
 if g_model == 'lgcn_b_r' or g_model == 'lgcn_b_ar' or g_model=='lgcn_ar':
-    rating_df = dp.add_u_rel_decay(rating_df=rating_df, beta=g_r_beta, win_size = g_win, method=r_method, verbose=g_verbose)
+    rating_df = dp.add_u_rel_decay(rating_df=rating_df, beta=g_r_beta, win_size = g_win, method=r_method, verbose=True)
 
 if g_num_exp == 1:
     rand_seed = [7]
