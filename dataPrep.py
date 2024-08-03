@@ -96,7 +96,7 @@ def load_data(dataset = "ml100k", verbose = False):
         
     return rating_df, user_df, item_df, rating_stat
 
-def load_data2(dataset = "ml100k", verbose = False):
+def load_data2(dataset = "ml100k", u_rating_thresh = 20, verbose = False):
     
     user_df = None
     item_df = None
@@ -274,7 +274,19 @@ def load_data2(dataset = "ml100k", verbose = False):
         df = df.rename(columns={'productId': 'itemId'})
         
         # Create a copy of the DataFrame to avoid SettingWithCopyWarning
-        ratings_df = df.copy()
+        #ratings_df = df.copy()
+        
+        # Filter users with at least a minimum number of interactions
+        
+        min_interactions = u_rating_thresh
+        user_interaction_counts = df['userId'].value_counts()
+        filtered_users = user_interaction_counts[user_interaction_counts >= min_interactions].index
+        
+        # Create a copy of the DataFrame to avoid SettingWithCopyWarning
+        df_filtered = df[df['userId'].isin(filtered_users)]
+
+        # Create a copy of the DataFrame to avoid SettingWithCopyWarning
+        ratings_df = df_filtered.copy()
     
     elif dataset == 'douban_book':
         # Paths for ML-1M data files
@@ -301,7 +313,7 @@ def load_data2(dataset = "ml100k", verbose = False):
         df['timestamp'] = pd.to_datetime(df['timestamp']).astype(int) // 10**9
         
         # Filter users with at least a minimum number of interactions
-        min_interactions = 20
+        min_interactions = u_rating_thresh
         user_interaction_counts = df['userId'].value_counts()
         filtered_users = user_interaction_counts[user_interaction_counts >= min_interactions].index
         
@@ -337,7 +349,7 @@ def load_data2(dataset = "ml100k", verbose = False):
         df['timestamp'] = pd.to_datetime(df['timestamp']).astype(int) // 10**9
         
          # Filter users with at least a minimum number of interactions
-        min_interactions = 20
+        min_interactions = u_rating_thresh
         user_interaction_counts = df['userId'].value_counts()
         filtered_users = user_interaction_counts[user_interaction_counts >= min_interactions].index
         
@@ -373,7 +385,7 @@ def load_data2(dataset = "ml100k", verbose = False):
         df['timestamp'] = pd.to_datetime(df['timestamp']).astype(int) // 10**9
         
         # Filter users with at least a minimum number of interactions
-        min_interactions = 20
+        min_interactions = u_rating_thresh
         user_interaction_counts = df['userId'].value_counts()
         filtered_users = user_interaction_counts[user_interaction_counts >= min_interactions].index
         

@@ -42,13 +42,14 @@ by_time = config['by_time']
 g_drop = config['drop']
 g_test_size = config['test_size']
 g_num_exp = config['num_exp']
+g_per_u_rating = config['per_u_rating']
 
 if g_verbose:
     print(f'loading {g_dataset} ...')
 
 def run_experiment(rating_df, num_users, num_items, g_mean_rating, g_seed):
 
-    rmat_data = dp.get_rmat_values(rating_df)
+    rmat_data = dp.get_rmat_values(rating_df, verbose=True)
 
     split_ratio = g_test_size
 
@@ -291,7 +292,7 @@ def run_experiment(rating_df, num_users, num_items, g_mean_rating, g_seed):
 
 
 # load the dataset
-rating_df, user_df, item_df, rating_stat = dp.load_data2(dataset=g_dataset, verbose=True)
+rating_df, user_df, item_df, rating_stat = dp.load_data2(dataset=g_dataset, u_rating_thresh = g_per_u_rating, verbose=True)
 num_users, num_items, g_mean_rating, num_ratings, time_distance = rating_stat['num_users'], rating_stat['num_items'], rating_stat['mean_rating'], rating_stat['num_ratings'], rating_stat['time_distance']
 
 # add time distance column by calculating timestamp from the fixed minimum point

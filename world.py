@@ -35,3 +35,4 @@ config['loadedModel'] = args.loadedModel
 config['drop'] = args.drop
 config['test_size'] = args.test_size
 config['num_exp'] = args.num_exp
+config['per_u_rating'] = args.per_u_rating
