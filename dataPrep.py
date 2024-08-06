@@ -851,7 +851,12 @@ def rmat_2_adjmat_simple(num_users, num_items, rmat_data):
 
     return edge_data
 
-def rmat_2_adjmat_simple_faster(num_users, num_items, rmat_data, verbose=False):
+
+def rmat_2_adjmat_simple_faster(num_users, num_items, rmat_data):
+    
+    def to_tensor(data, dtype):
+        return data if isinstance(data, torch.Tensor) else torch.tensor(data, dtype=dtype).clone().detach()
+    
     rmat_index = rmat_data['rmat_index']
     rmat_values = rmat_data['rmat_values']
     rmat_ts = rmat_data['rmat_ts']
@@ -868,17 +873,17 @@ def rmat_2_adjmat_simple_faster(num_users, num_items, rmat_data, verbose=False):
     edge_attr_abs_decay = torch.zeros(2 * num_edges, dtype=torch.float)
     edge_attr_rel_decay = torch.zeros(2 * num_edges, dtype=torch.float)
 
-    # Convert input data to tensors
-    user_indices = torch.tensor(rmat_index[0], dtype=torch.long).clone().detach()
-    item_indices = torch.tensor(rmat_index[1], dtype=torch.long).clone().detach() + num_users
+    # Convert input data to tensors if not already
+    user_indices = to_tensor(rmat_index[0], dtype=torch.long)
+    item_indices = to_tensor(rmat_index[1], dtype=torch.long) + num_users
 
     # Populate tensors with original edges
     edge_index[0, :num_edges] = user_indices
     edge_index[1, :num_edges] = item_indices
-    edge_values[:num_edges] = torch.tensor(rmat_values, dtype=torch.float).clone().detach()
-    edge_attr_ts[:num_edges] = torch.tensor(rmat_ts, dtype=torch.float).clone().detach()
-    edge_attr_abs_decay[:num_edges] = torch.tensor(rmat_abs_t_decay, dtype=torch.float).clone().detach()
-    edge_attr_rel_decay[:num_edges] = torch.tensor(rmat_rel_t_decay, dtype=torch.float).clone().detach()
+    edge_values[:num_edges] = to_tensor(rmat_values, dtype=torch.float)
+    edge_attr_ts[:num_edges] = to_tensor(rmat_ts, dtype=torch.float)
+    edge_attr_abs_decay[:num_edges] = to_tensor(rmat_abs_t_decay, dtype=torch.float)
+    edge_attr_rel_decay[:num_edges] = to_tensor(rmat_rel_t_decay, dtype=torch.float)
 
     # Populate tensors with reverse edges
     edge_index[0, num_edges:] = item_indices
@@ -897,9 +902,9 @@ def rmat_2_adjmat_simple_faster(num_users, num_items, rmat_data, verbose=False):
     }
 
     if verbose:
-        print("Edge data created.")
-        
+        print("adjmat_simple_faster done.")
     return edge_data
+
 
 
 
