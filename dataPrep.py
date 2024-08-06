@@ -436,8 +436,8 @@ def add_u_abs_decay(rating_df, beta = 0.05, method = 'log', verbose = False):
         print(f'Time time distance between max and min:{_max_distance}')
         print(f'The a_beta in user absolute drift:{_beta}')
     
-    if method == 'linear':
-        rating_df['u_abs_decay'] = _base + ((rating_df['timestamp'] - _start) / _win_unit)
+    if method == 'lin':
+        rating_df['u_abs_decay'] = ((rating_df['timestamp'] - _start) / _max_distance)
     if method == 'log':
         rating_df['u_abs_decay'] = _base + np.power(((rating_df['timestamp'] - _start) / _win_unit), _beta)
     if method == 'log_old':
@@ -479,9 +479,27 @@ def add_u_rel_decay(rating_df, beta = 25, win_size = 1, method = 'exp', verbose 
 
     # Step 3: Merge the minimum timestamps back into the original DataFrame
     rating_df = pd.merge(rating_df, min_timestamp_per_user, on='userId')
+    
+    # Step 4: Calculate the max timestamp for each userId
+    max_timestamp_per_user = rating_df.groupby('userId')['timestamp'].max().reset_index()
+    max_timestamp_per_user.columns = ['userId', 'max_timestamp']
+    
+    # Step 5: Merge the maximum timestamps back into the original DataFrame
+    rating_df = pd.merge(rating_df, max_timestamp_per_user, on='userId')
+    
+    # Step 6: Calculate the time distance for each userId
+    rating_df['time_distance'] = (rating_df['max_timestamp'] - rating_df['min_timestamp']) / 86400
 
     # Step 4: Calculate the 'u_rel_decay' column
-    if method == 'log':
+    if method == 'lin':
+        # use time distance to normalize the time difference
+        if rating_df['time_distance'].max() != 0:
+            rating_df['u_rel_decay'] = ((rating_df['timestamp'] - rating_df['min_timestamp']) / (rating_df['time_distance']))
+        else: # it should be zero
+            rating_df['u_rel_decay'] = 0
+            
+        #rating_df['u_rel_decay'] = ((rating_df['timestamp'] - rating_df['min_timestamp']) / (rating_df['timestamp'].max() - rating_df['timestamp'].min()))
+    elif method == 'log':
         rating_df['u_rel_decay'] = _base + np.power(((rating_df['timestamp'] - rating_df['min_timestamp']) / _win_unit), _beta)
     elif method == 'exp':
         rating_df['u_rel_decay'] = _base + np.exp(-_beta * (rating_df['timestamp'] - rating_df['min_timestamp']) / _win_unit)
@@ -595,6 +613,10 @@ def get_rmat_values(rating_df, rating_threshold = 0, verbose = False):
                  'rmat_ts': torch.tensor(rmat_ts), 
                  'rmat_abs_t_decay': torch.tensor(rmat_abs_decay), 
                  'rmat_rel_t_decay': torch.tensor(rmat_rel_decay)}
+    
+    if verbose:
+        print(f"Number of edges: {len(rmat_values)}")
+        print("done getting rmat values.")
     
     return rmat_data
 
@@ -818,6 +840,53 @@ def rmat_2_adjmat_simple(num_users, num_items, rmat_data):
     edge_attr_ts = torch.tensor(edge_attr_ts, dtype=torch.float)
     edge_attr_abs_decay = torch.tensor(edge_attr_abs_decay, dtype=torch.float)
     edge_attr_rel_decay = torch.tensor(edge_attr_rel_decay, dtype=torch.float)
+
+    edge_data = {
+        'edge_index': edge_index,
+        'edge_values': edge_values,
+        'edge_attr_ts': edge_attr_ts,
+        'edge_attr_abs_decay': edge_attr_abs_decay,
+        'edge_attr_rel_decay': edge_attr_rel_decay
+    }
+
+    return edge_data
+
+
+def rmat_2_adjmat_simple_faster(num_users, num_items, rmat_data):
+    rmat_index = rmat_data['rmat_index']
+    rmat_values = rmat_data['rmat_values']
+    rmat_ts = rmat_data['rmat_ts']
+    rmat_abs_t_decay = rmat_data['rmat_abs_t_decay']
+    rmat_rel_t_decay = rmat_data['rmat_rel_t_decay']
+
+    num_total = num_users + num_items
+    num_edges = len(rmat_index[0])
+
+    # Preallocate tensors for edges and their attributes
+    edge_index = torch.zeros((2, 2 * num_edges), dtype=torch.long)
+    edge_values = torch.zeros(2 * num_edges, dtype=torch.float)
+    edge_attr_ts = torch.zeros(2 * num_edges, dtype=torch.float)
+    edge_attr_abs_decay = torch.zeros(2 * num_edges, dtype=torch.float)
+    edge_attr_rel_decay = torch.zeros(2 * num_edges, dtype=torch.float)
+
+    user_indices = torch.tensor(rmat_index[0], dtype=torch.long)
+    item_indices = torch.tensor(rmat_index[1], dtype=torch.long) + num_users
+
+    # Populate tensors with original edges
+    edge_index[0, :num_edges] = user_indices
+    edge_index[1, :num_edges] = item_indices
+    edge_values[:num_edges] = torch.tensor(rmat_values, dtype=torch.float)
+    edge_attr_ts[:num_edges] = torch.tensor(rmat_ts, dtype=torch.float)
+    edge_attr_abs_decay[:num_edges] = torch.tensor(rmat_abs_t_decay, dtype=torch.float)
+    edge_attr_rel_decay[:num_edges] = torch.tensor(rmat_rel_t_decay, dtype=torch.float)
+
+    # Populate tensors with reverse edges
+    edge_index[0, num_edges:] = item_indices
+    edge_index[1, num_edges:] = user_indices
+    edge_values[num_edges:] = torch.tensor(rmat_values, dtype=torch.float)
+    edge_attr_ts[num_edges:] = torch.tensor(rmat_ts, dtype=torch.float)
+    edge_attr_abs_decay[num_edges:] = torch.tensor(rmat_abs_t_decay, dtype=torch.float)
+    edge_attr_rel_decay[num_edges:] = torch.tensor(rmat_rel_t_decay, dtype=torch.float)
 
     edge_data = {
         'edge_index': edge_index,

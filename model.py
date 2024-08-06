@@ -165,11 +165,13 @@ class LGCN(MessagePassing):
         if self.u_abs_drift:
             _u_abs_drift_emb = self._u_abs_drift_emb.weight[src]
             _u_abs_drift_emb = _u_abs_drift_emb * u_abs_t_decay.unsqueeze(1)
+            #_u_abs_drift_emb = self.f(_u_abs_drift_emb)
             _inner_pro = _inner_pro + _u_abs_drift_emb
             
         if self.u_rel_drift:
             _u_rel_drift_emb = self._u_rel_drift_emb.weight[src]
             _u_rel_drift_emb = _u_rel_drift_emb * u_rel_t_decay.unsqueeze(1) 
+            #_u_rel_drift_emb = self.f(_u_rel_drift_emb)
             _inner_pro = _inner_pro + _u_rel_drift_emb
              
         _inner_pro = torch.sum(_inner_pro, dim=-1)
