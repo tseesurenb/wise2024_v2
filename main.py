@@ -54,7 +54,7 @@ def run_experiment(rating_df, num_users, num_items, g_mean_rating, g_seed):
     split_ratio = g_test_size
 
     #dp.rmat_2_adjmat_simple(num_users, num_items, rmat_data)
-    dp.rmat_2_adjmat_simple_faster(num_users, num_items, rmat_data)
+    dp.rmat_2_adjmat_simple_faster(num_users, num_items, rmat_data, verbose=True)
     
     
     
