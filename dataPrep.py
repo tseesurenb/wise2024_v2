@@ -247,9 +247,17 @@ def load_data2(dataset = "ml100k", u_rating_thresh = 20, verbose = False):
                 
         # Option 2: Drop rows with NA timestamps
         df_selected = df_selected.dropna(subset=['timestamp'])
-
+      
+         # Filter users with at least a minimum number of interactions
+        min_interactions = u_rating_thresh
+        user_interaction_counts = df_selected['userId'].value_counts()
+        filtered_users = user_interaction_counts[user_interaction_counts >= min_interactions].index
+        
         # Create a copy of the DataFrame to avoid SettingWithCopyWarning
-        ratings_df = df_selected.copy()
+        df_filtered = df_selected[df_selected['userId'].isin(filtered_users)]
+        
+        # Create a copy of the DataFrame to avoid SettingWithCopyWarning
+        ratings_df = df_filtered.copy()
         
     elif dataset == 'epinion':
         # Paths for ML-1M data files
