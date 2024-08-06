@@ -851,7 +851,6 @@ def rmat_2_adjmat_simple(num_users, num_items, rmat_data):
 
     return edge_data
 
-
 def rmat_2_adjmat_simple_faster(num_users, num_items, rmat_data):
     rmat_index = rmat_data['rmat_index']
     rmat_values = rmat_data['rmat_values']
@@ -883,10 +882,10 @@ def rmat_2_adjmat_simple_faster(num_users, num_items, rmat_data):
     # Populate tensors with reverse edges
     edge_index[0, num_edges:] = item_indices
     edge_index[1, num_edges:] = user_indices
-    edge_values[num_edges:] = torch.tensor(rmat_values, dtype=torch.float)
-    edge_attr_ts[num_edges:] = torch.tensor(rmat_ts, dtype=torch.float)
-    edge_attr_abs_decay[num_edges:] = torch.tensor(rmat_abs_t_decay, dtype=torch.float)
-    edge_attr_rel_decay[num_edges:] = torch.tensor(rmat_rel_t_decay, dtype=torch.float)
+    edge_values[num_edges:] = edge_values[:num_edges]
+    edge_attr_ts[num_edges:] = edge_attr_ts[:num_edges]
+    edge_attr_abs_decay[num_edges:] = edge_attr_abs_decay[:num_edges]
+    edge_attr_rel_decay[num_edges:] = edge_attr_rel_decay[:num_edges]
 
     edge_data = {
         'edge_index': edge_index,
@@ -897,6 +896,7 @@ def rmat_2_adjmat_simple_faster(num_users, num_items, rmat_data):
     }
 
     return edge_data
+
 
 
 def rmat_2_adjmat2(num_users, num_items, rmat_data):
