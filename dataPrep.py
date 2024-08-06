@@ -402,6 +402,39 @@ def load_data2(dataset = "ml100k", u_rating_thresh = 20, verbose = False):
 
         # Create a copy of the DataFrame to avoid SettingWithCopyWarning
         ratings_df = df_filtered.copy()
+    
+    elif dataset == 'yelp':
+        # Paths for ML-1M data files
+        ratings_path = f'data/yelp/yelp_reviews.csv'
+         #item_id,user_id,rating,timestamp,size,fit,user_attr,model_attr,category,brand,year,split
+        
+        if verbose:
+            print(ratings_path)
+
+        # Read the text file into a DataFrame
+        df = pd.read_csv(ratings_path, sep=',')
+
+        # Select and rename the columns to match the desired format
+        # 'book_id' becomes 'itemId', 'user_id' becomes 'userId', 'rating' remains 'rating', 'time' becomes 'timestamp'
+        # "user_id"	"music_id"	"rating"	"labels"	"comment"	"useful_num"	"time"	"ID"
+        df = df[['user_id', 'item_id', 'rating', 'timestamp']]
+        
+        df = df.rename(columns={'user_id': 'userId', 'item_id': 'itemId'})
+                
+        # Convert the timestamp column to Unix timestamps
+        df['timestamp'] = pd.to_datetime(df['timestamp']).astype(int) // 10**9
+        
+        # Filter users with at least a minimum number of interactions
+        min_interactions = u_rating_thresh
+        user_interaction_counts = df['userId'].value_counts()
+        filtered_users = user_interaction_counts[user_interaction_counts >= min_interactions].index
+        
+        # Create a copy of the DataFrame to avoid SettingWithCopyWarning
+        df_filtered = df[df['userId'].isin(filtered_users)]
+
+        # Create a copy of the DataFrame to avoid SettingWithCopyWarning
+        ratings_df = df_filtered.copy()
+        
         
     _lbl_user = preprocessing.LabelEncoder()
     _lbl_movie = preprocessing.LabelEncoder()
