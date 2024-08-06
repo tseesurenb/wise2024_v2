@@ -852,7 +852,7 @@ def rmat_2_adjmat_simple(num_users, num_items, rmat_data):
     return edge_data
 
 
-def rmat_2_adjmat_simple_faster(num_users, num_items, rmat_data):
+def rmat_2_adjmat_simple_faster(num_users, num_items, rmat_data, verbose=False):
     
     def to_tensor(data, dtype):
         return data if isinstance(data, torch.Tensor) else torch.tensor(data, dtype=dtype).clone().detach()
